@@ -5,13 +5,12 @@ const socket = io('http://localhost:3020')
 let userName;
 
 
-const Chatroom = () => {
+const Chatroom = ({userName}) => {
 
     const [chat, setChat] = useState([])
     const [newMessage, setNewMessage] = useState({message: '', name: ''})
 
     useEffect(() => {
-        userName = getName()
         socket.emit('new-user', userName)
         setChat(chat.concat({...newMessage, message: "You joined the chat"}))
       }, [])

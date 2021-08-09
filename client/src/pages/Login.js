@@ -1,10 +1,13 @@
 import {Link, useHistory} from "react-router-dom";
 import {useState, useEffect} from 'react'; 
 
-const Login = () => {
+const Login = ({verifyUser, setUsername}) => {
 
     const [email, setEmail] = useState('')
     const [pw, setPw] = useState('')
+    const [loggedIn, setLoggedIn] = useState(false)
+    const [error, setError] = useState('')
+
     const history = useHistory()
 
     const handleSubmit = (e) => {
@@ -16,20 +19,28 @@ const Login = () => {
             body: JSON.stringify({email, pw})
         })
         .then(res => {
-            setEmail('')
-            setPw('')
             // always return inside curly braces!!
             return res.json()
         })
         .then(data => {
             if (data.user) {
+                verifyUser()
+                setUsername(data.name)
                 history.push('/')
             } else {
-                console.log("an error has occured.")
+                console.log(data.errorMsg.login)
+                setError(data.errorMsg.login)
             }
         })
         .catch(err => console.log(err.message))
-    
+    }
+
+    const handleEmailInput = (e) => {
+        setEmail(e.target.value)
+    }
+
+    const handlePwInput = (e) => {
+        setPw(e.target.value)
     }
      
     return (
@@ -37,13 +48,12 @@ const Login = () => {
         <form onSubmit={handleSubmit}>
             <h1>Login</h1>
             <label for="email">Email</label>
-            <input type="email" name="email" onChange={(e) => setEmail(e.target.value)} value={email} autoComplete="off" required></input>
-            <div class="email error"></div>
+            <input type="email" name="email" onChange={handleEmailInput} value={email} autoComplete="off" required></input>
             <label for="password">Password</label>
-            <input type="password" name="password" value={pw} onChange={(e) => setPw(e.target.value)} required></input>
-            <div class="password error"></div>
+            <input type="password" name="password" value={pw} onChange={handlePwInput} required></input>
             <p className='login'>New user?</p>
             <Link to='/signup'>sign up here</Link>
+            <div class="login error">{error}</div>
             <button>Login</button>
             </form>
     </div>

@@ -6,7 +6,9 @@ const Signup = () => {
     const [email, setEmail] = useState('')
     const [pw, setPw] = useState('')
     const [name, setName] = useState({first: '', last: ''})
+    const [error, setError] = useState({email: '', password: ''})
     const history = useHistory()
+
     const handleSubmit = (e) => {
         e.preventDefault()
 
@@ -16,23 +18,33 @@ const Signup = () => {
             body: JSON.stringify({email, pw, name})
         })
         .then(res => {
-            setEmail('')
-            setPw('')
-            setName({first: '', last: ''})
             // always return inside curly braces!!
             return res.json()
         })
         .then(data => {
             if (data.user) {
-                history.push('/')
+                setEmail('')
+                setPw('')
+                setName({first: '', last: ''})
+                history.push('/login')
             } else {
-                console.log("an error has occured.")
+                setError({...error, email: data.errorMsg.email, password: data.errorMsg.password})
             }
         })
         .catch(err => console.log(err.message))
     
     }
-     
+    
+    const handleEmailInput = (e) => {
+        setEmail(e.target.value)
+        setError({...error, email: ''})
+    }
+
+    const handlePwInput = (e) => {
+        setPw(e.target.value)
+        setError({...error, password: ''})
+    }
+
     return (
     <div className='sign-up-or-login'>
         <form onSubmit={handleSubmit}>
@@ -48,11 +60,11 @@ const Signup = () => {
                 </div>
             </div>
             <label for="email">Email</label>
-            <input type="email" name="email" onChange={(e) => setEmail(e.target.value)} value={email} autoComplete="off" required></input>
-            <div class="email error"></div>
+            <input type="text" name="email" onChange={handleEmailInput} value={email} autoComplete="off" required></input>
+            <div class="email error">{error.email}</div>
             <label for="password">Password</label>
-            <input type="password" name="password" value={pw} onChange={(e) => setPw(e.target.value)} required></input>
-            <div class="password error"></div>
+            <input type="password" name="password" value={pw} onChange={handlePwInput} required></input>
+            <div class="password error">{error.password}</div>
             <p>Already a member?</p>
             <Link to='/login'>Login</Link>
             <button>Sign up</button>
