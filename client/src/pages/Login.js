@@ -23,7 +23,7 @@ const Login = ({verifyUser, setUsername}) => {
             return res.json()
         })
         .then(data => {
-            if (data.user) {
+            if (data.userID) {
                 verifyUser()
                 setUsername(data.name)
                 history.push('/')
@@ -35,12 +35,12 @@ const Login = ({verifyUser, setUsername}) => {
         .catch(err => console.log(err.message))
     }
 
-    const handleEmailInput = (e) => {
-        setEmail(e.target.value)
+    const handleEmailInput = ({target}) => {
+        setEmail(target.value)
     }
 
-    const handlePwInput = (e) => {
-        setPw(e.target.value)
+    const handlePwInput = ({target}) => {
+        setPw(target.value)
     }
      
     return (
@@ -53,11 +53,11 @@ const Login = ({verifyUser, setUsername}) => {
             <input type="password" name="password" value={pw} onChange={handlePwInput} required></input>
             <p className='login'>New user?</p>
             <Link to='/signup'>sign up here</Link>
-            <div class="login error">{error}</div>
+            {error && <div class="login error">{error}</div>}
             <button>Login</button>
             </form>
     </div>
      );
 }
- 
+
 export default Login;

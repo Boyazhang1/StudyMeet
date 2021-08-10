@@ -1,5 +1,5 @@
-import {BrowserRouter as Router, Switch, Route, Link} from "react-router-dom";
-import {useState} from 'react'; 
+import {BrowserRouter as Router, Switch, Route, Link, Redirect} from "react-router-dom";
+import {useState, useEffect} from 'react'; 
 import Navbar from "./components/Navbar";
 import Chatroom from './pages/Chatroom';
 import Homepage from './pages/Homepage';
@@ -12,12 +12,17 @@ import Cookies from "js-cookie"
 function App() {
   const [loggedIn, setLoggedIn] = useState(false)
   const [userName, setUsername] = useState('')
+  console.log(userName)
   const verifyUser = () => {
-    if (Cookies.set('jwt')) {
+    if (Cookies.get('jwt')) {
       setLoggedIn(true)
     }
   }
-  
+  useEffect(() => {
+    verifyUser()
+  }, [])
+  console.log(loggedIn)
+
   return (
     <Router>
     <div className="App">
@@ -29,7 +34,7 @@ function App() {
           <Homepage/>
         </Route>
         <Route path='/chatroom'>
-          <Chatroom userName={userName}/>
+          {Cookies.get('jwt') ? <Chatroom userName={userName}/> : <Redirect to="/login" />}
         </Route>
         <Route path='/signup'>
           <Signup/>

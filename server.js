@@ -2,9 +2,7 @@ require('dotenv').config()
 const express = require('express')
 const app = express()
 const mongoose = require('mongoose')
-const User = require('./models/user')
-const jwt = require('jsonwebtoken')
-const cookieParser = require('cookie-parser')
+const router = require('./routes/authenticationRoutes')
 const httpServer = require('http').createServer(app)
 const io = require('socket.io')(httpServer, {
   cors: {
@@ -16,6 +14,7 @@ const io = require('socket.io')(httpServer, {
 
 app.use(express.urlencoded({extended: true}));
 app.use(express.json())
+app.use(router)
 
 
 const url = process.env.MONGODB_URI
@@ -24,65 +23,7 @@ mongoose.connect(url, {useNewUrlParser: true, useUnifiedTopology: true, useFindA
   .catch(err => console.log(err.message))
 
 
-
-const maxAge = 24 * 60 * 60;
-
-const createToken = (id) => {
-  return jwt.sign({id}, 'key', {expiresIn: maxAge})
-}
-
-const handleError = (err) => {
-  let errorMessage = {email: '', password: '', login: ''}
-  
-  if (err.code === 11000) {
-    errorMessage.email = "that email is already registerd"
-  }
-  if (['Incorrect password', "User doesn't exist"].some(msg => err.message === msg)) {
-    errorMessage.login = "incorrect username or password"
-  }
-  if (err.message.includes('user validation failed')) {
-    Object.values(err.errors).forEach(({properties}) => {
-      errorMessage[properties.path] = properties.message
-    })
-  }
-  return errorMessage
-}
-
-
-app.post('/api/signup', async (req, res) => {
-  const {email, pw, name} = req.body;
-
-  try {
-    const user = await User.create({email, password: pw, first_name: name.first, last_name: name.last})
-    res.status(201).json({user: user._id})
-  } catch (err) {
-    const errorMsg = handleError(err)
-    res.status(401).json({errorMsg})
-  }
-})
-
-app.post('/api/login', async (req, res) => {
-  const {email, pw} = req.body
-  
-  try {
-  const user = await User.login(email, pw)
-  const token = createToken(user._id)
-  res.cookie('jwt', token, {httpOnly: true, maxAge: maxAge * 1000})
-  res.status(200).json({user: user._id, name: user.first_name})
-  } catch (err) {
-    const errorMsg = handleError(err)
-    res.status(401).json({errorMsg})
-  }
-})
-
-app.get('/api/logout', async (req, res) => {
-  res.cookie('jwt', '', {maxAge: 1})
-  res.sendStatus(200)
-})
-
-
 const users = {}
-
 io.on('connection', socket => {
   console.log(socket.id)
 
@@ -93,7 +34,6 @@ io.on('connection', socket => {
   })
 
   socket.on('send-message', messageObj => {
-    console.log(messageObj)
     socket.broadcast.emit('recieved-message', messageObj)
   })
 

@@ -1,11 +1,12 @@
 import {useState, useEffect} from 'react'
 import io from 'socket.io-client'
 import {getName} from '../utils/utils'
+import Cookies from 'js-cookie'
+import jwt_decode from "jwt-decode"
 const socket = io('http://localhost:3020')
-let userName;
+const Chatroom = () => {
 
-
-const Chatroom = ({userName}) => {
+    const userName = jwt_decode(Cookies.get('jwt')).name
 
     const [chat, setChat] = useState([])
     const [newMessage, setNewMessage] = useState({message: '', name: ''})
@@ -37,27 +38,33 @@ const Chatroom = ({userName}) => {
         setNewMessage({message: '', name: ''})
     }
 
-    const handleInput = (e) => {
-        setNewMessage({...newMessage, message: e.target.value})
+    const handleInput = ({target}) => {
+        setNewMessage({...newMessage, message: target.value})
     }
 
+    const getTime = () => {
+        const date = new Date()
+        return date.toLocaleTimeString('en-US', {hour: '2-digit', minute: '2-digit'})
+    }
     return (
     <div className='chatroom'>
         <h1>Chatroom</h1>
         <div className='chat-container'>
             <div className="chat-message-list">
-            {chat && chat.map(({message, name}, index) => (
+            {chat && chat.slice().reverse().map(({message, name}, index) => (
             <div className="message-container">
                 {name 
                     ? 
-                    (name == userName 
+                    (name == userName
                         ?
                         <div className='sent-message'>
                             <p key={index}>{name}: {message}</p>
+                            <span>{getTime()}</span>
                         </div>
                         :
                         <div className='received-message'>
                             <p key={index}>{name}: {message}</p>
+                            <p>{getTime()}</p>
                         </div>
                     )
                     : <p key={index} className="join-leave">{message}</p>}
@@ -66,7 +73,7 @@ const Chatroom = ({userName}) => {
             </div>
             <div className='message-input'>
                 <form onSubmit={handleSubmit}>
-                    <input type='text' value={newMessage.message} onChange={handleInput} placeholder="type a message"></input>
+                    <input type='text' value={newMessage.message} onChange={handleInput} placeholder="type a message" required></input>
                     <button type='submit'>Submit</button>
                 </form>
         </div>

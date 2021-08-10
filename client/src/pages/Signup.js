@@ -35,13 +35,13 @@ const Signup = () => {
     
     }
     
-    const handleEmailInput = (e) => {
-        setEmail(e.target.value)
+    const handleEmailInput = ({target}) => {
+        setEmail(target.value)
         setError({...error, email: ''})
     }
 
-    const handlePwInput = (e) => {
-        setPw(e.target.value)
+    const handlePwInput = ({target}) => {
+        setPw(target.value)
         setError({...error, password: ''})
     }
 
