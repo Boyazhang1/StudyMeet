@@ -1,7 +1,7 @@
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import {BrowserRouter as Router, Switch, Route, Link} from "react-router-dom";
 
-const Homepage = () => {
+const Homepage = ({loggedIn}) => {
 
     // const [newRoomName, setNewRoomName] = useState('')
 
@@ -13,9 +13,13 @@ const Homepage = () => {
     //     }).then(res => {
     //     })
     // }
+
     return (
         <div className="homepage">
             <h1>Welcome to Handshake!</h1>
+            <p>An app where you can practice making texting first impressions.</p>
+            <br/>
+            {loggedIn ? <Link to='/chatroom'>Start chatting now</Link>: <Link to='/signup'>Try it here!</Link>}
             {/* <Link to='/chatroom'>Click here to enter chatroom</Link> */}
         </div>
     //     <div id="room-container">

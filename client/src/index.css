@@ -80,7 +80,7 @@
   grid-column-end: 3; 
   height: 100px;
   display: grid;
-  max-width: 90%;
+  max-width: 100%;
 }
 .message-container {
   margin-bottom: 5px;
@@ -141,7 +141,7 @@
 .message-input input {
   margin-top: 20px;
   height: 40px;
-  width: 200px;
+  width: 300px;
   border-style: none;
   border-radius: 4px 0 0 4px;
   padding: 0 5px;

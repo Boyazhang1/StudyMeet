@@ -1,11 +1,10 @@
 import {Link, useHistory} from "react-router-dom";
 import {useState, useEffect} from 'react'; 
 
-const Login = ({verifyUser, setUsername}) => {
+const Login = ({verifyUser}) => {
 
     const [email, setEmail] = useState('')
     const [pw, setPw] = useState('')
-    const [loggedIn, setLoggedIn] = useState(false)
     const [error, setError] = useState('')
 
     const history = useHistory()
@@ -25,7 +24,6 @@ const Login = ({verifyUser, setUsername}) => {
         .then(data => {
             if (data.userID) {
                 verifyUser()
-                setUsername(data.name)
                 history.push('/')
             } else {
                 console.log(data.errorMsg.login)

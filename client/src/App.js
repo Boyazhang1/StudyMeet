@@ -11,8 +11,7 @@ import Cookies from "js-cookie"
 
 function App() {
   const [loggedIn, setLoggedIn] = useState(false)
-  const [userName, setUsername] = useState('')
-  console.log(userName)
+
   const verifyUser = () => {
     if (Cookies.get('jwt')) {
       setLoggedIn(true)
@@ -31,16 +30,16 @@ function App() {
       </div>
       <Switch>
         <Route exact path='/'>
-          <Homepage/>
+          <Homepage loggedIn={loggedIn}/>
         </Route>
         <Route path='/chatroom'>
-          {Cookies.get('jwt') ? <Chatroom userName={userName}/> : <Redirect to="/login" />}
+          {Cookies.get('jwt') ? <Chatroom/> : <Redirect to="/login" />}
         </Route>
         <Route path='/signup'>
           <Signup/>
         </Route>
         <Route path='/login'>
-          <Login verifyUser={verifyUser} setUsername={setUsername}/>
+          <Login verifyUser={verifyUser}/>
         </Route>
       </Switch>
     </div>

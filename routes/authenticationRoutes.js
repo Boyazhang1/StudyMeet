@@ -46,7 +46,7 @@ router.post('/api/login', async (req, res) => {
     const user = await User.login(email, pw)
     const token = createToken(user._id, user.first_name)
     res.cookie('jwt', token, {maxAge: maxAge * 1000})
-    res.status(200).json({userID: user._id, name: user.first_name})
+    res.status(200).json({userID: user._id})
     } catch (err) {
       const errorMsg = handleError(err)
       res.status(404).json({errorMsg})
