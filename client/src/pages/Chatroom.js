@@ -1,10 +1,8 @@
 import {useState, useEffect} from 'react'
-import io from 'socket.io-client'
-import {getName} from '../utils/utils'
 import Cookies from 'js-cookie'
 import jwt_decode from "jwt-decode"
-const socket = io('http://localhost:3020')
-const Chatroom = () => {
+
+const Chatroom = ({socket, roomName}) => {
 
     const userName = jwt_decode(Cookies.get('jwt')).name
 
@@ -12,7 +10,8 @@ const Chatroom = () => {
     const [newMessage, setNewMessage] = useState({message: '', name: ''})
 
     useEffect(() => {
-        socket.emit('new-user', userName)
+        socket.emit('new-user', userName, roomName)
+        console.log('new user emitted')
         setChat(chat.concat({...newMessage, message: "You joined the chat"}))
       }, [])
 
@@ -34,7 +33,7 @@ const Chatroom = () => {
         const messageData = {message: newMessage.message, name: userName}
         setChat(chat.concat(messageData))
         console.log(messageData)
-        socket.emit('send-message', messageData)
+        socket.emit('send-message', messageData, roomName)
         setNewMessage({message: '', name: ''})
     }
 
@@ -64,7 +63,7 @@ const Chatroom = () => {
                         :
                         <div className='received-message'>
                             <p key={index}>{name}: {message}</p>
-                            <p>{getTime()}</p>
+                            <span>{getTime()}</span>
                         </div>
                     )
                     : <p key={index} className="join-leave">{message}</p>}

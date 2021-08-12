@@ -6,21 +6,28 @@ import Homepage from './pages/Homepage';
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Cookies from "js-cookie"
-
+import Lobby from "./pages/Lobby";
+import io from 'socket.io-client'
+const socket = io('http://localhost:3020')
 
 
 function App() {
   const [loggedIn, setLoggedIn] = useState(false)
-
+  const [rooms, setRooms] = useState([])
+  
   const verifyUser = () => {
     if (Cookies.get('jwt')) {
       setLoggedIn(true)
     }
   }
+
   useEffect(() => {
     verifyUser()
   }, [])
-  console.log(loggedIn)
+
+  socket.on('new-room', roomName => {
+    setRooms(rooms.concat(roomName))
+  })
 
   return (
     <Router>
@@ -32,15 +39,20 @@ function App() {
         <Route exact path='/'>
           <Homepage loggedIn={loggedIn}/>
         </Route>
-        <Route path='/chatroom'>
-          {Cookies.get('jwt') ? <Chatroom/> : <Redirect to="/login" />}
-        </Route>
         <Route path='/signup'>
-          <Signup/>
+          {loggedIn ? <Redirect to="/"/> : <Signup/>}
         </Route>
         <Route path='/login'>
-          <Login verifyUser={verifyUser}/>
+          {loggedIn  ? <Redirect to="/"/> : <Login verifyUser={verifyUser}/>}
         </Route>
+        <Route exact path='/rooms'>
+          {Cookies.get('jwt') ? <Lobby rooms={rooms} setRooms={setRooms}/> : <Redirect to="/login" />}
+        </Route>
+        {rooms && rooms.map(roomName => (
+          <Route path={'/rooms/' + roomName}>
+            <Chatroom socket={socket} roomName={roomName}/>
+          </Route>
+        ))}
       </Switch>
     </div>
     </Router>

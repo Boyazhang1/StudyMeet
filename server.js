@@ -23,25 +23,41 @@ mongoose.connect(url, {useNewUrlParser: true, useUnifiedTopology: true, useFindA
   .catch(err => console.log(err.message))
 
 
-const users = {}
+const rooms = {}
+app.post('/api/rooms', (req, res) => {
+  const roomName = req.body.roomName
+  console.log(rooms[roomName])
+  if (rooms[roomName]) {
+    return res.status(404).json({error: 'that room already exists'})
+  }
+  rooms[roomName] = {users: {}}
+  io.emit("new-room", req.body.roomName)
+  res.status(200).json({rooms})
+})
+
+
 io.on('connection', socket => {
   console.log(socket.id)
 
-  socket.on('new-user', userName => {
-    users[socket.id] = userName
-    socket.broadcast.emit('user-connected', userName)
-    console.log(`${userName} has joined.`)
+  socket.on('new-user', (userName, roomName) => {
+    socket.join(roomName)
+    rooms[roomName].users[socket.id] = userName
+    socket.to(roomName).emit('user-connected', userName)
+    console.log(`${userName} has joined ${roomName}`)
   })
 
-  socket.on('send-message', messageObj => {
-    socket.broadcast.emit('recieved-message', messageObj)
+  socket.on('send-message', (messageObj, roomName) => {
+    socket.to(roomName).emit('recieved-message', messageObj)
   })
 
   socket.on('disconnect', () => {
-    console.log(`${users[socket.id]} has left.`)
-    socket.broadcast.emit('user-disconnected', users[socket.id])
-    delete users[socket.id]
+    getUserRooms(socket).forEach(roomName => {
+      socket.to(roomName).emit('user-disconnected', rooms[roomName].users[socket.id])
+      console.log(`${rooms[roomName].users[socket.id]} has left ${roomName}`)
+      delete rooms[roomName].users[socket.id]
+    })
   })
+
 })
 
 const port = process.env.PORT
@@ -49,53 +65,16 @@ httpServer.listen(port, function() {
   console.log(`listening on port ${port}`)
 })
 
+const getUserRooms = socket => {
+  return Object.keys(rooms).filter(roomName => {
+    let roomUsers = rooms[roomName].users 
+      if (socket.id in roomUsers) {
+        return true
+      } 
+      return false
+  })
+}
 
-// const app = require('express')()
-// const httpServer = require('http').createServer(app)
-// const io = require('socket.io')(httpServer); 
-// // const users = {}
-
-// io.on('connection', (socket) => {
-//     console.log(socket.id)
-//     socket.on('new-user', (userName) => {
-//         console.log(`${userName} has joined.`)
-//     })
-// }); 
-
-// httpServer.listen(3020, () => console.log('listening on port 3020'))
-
-
-
-// app.post('/api/room', (req, res) => {
-//     if (rooms[req.body.room] != null) {
-//         return res.redirect('/')
-//     }
-//     rooms[req.body.room] = {users: {} }
-//     res.redirect(req.body.room)
-//     io.emit('new-room', req.body.room)
-// })
-
-
-// app.get('/api/:room', (req, res) => {
-//     if (rooms[req.params.room] == null) {
-//         return res.redirect('/')
-//     }
-//     res.render('room', {roomName: req.params.room})
-// })
-
-    // socket.on('new-user', (userName) => {
-    //     users[socket.id] = userName
-    //     console.log(socket.id, userName)
-    //     socket.broadcast.emit('user-connected', userName)
-    // })
-    // socket.on('send-message', (message) => {
-    //     socket.broadcast.emit('display-message', {message})
-    // })
-    // socket.on('disconnect', () => {
-    //     socket.broadcast.emit('user-disconnected', users[socket.id])
-    //     delete users[socket.id]
-    //     })
-    // })
 
 
 

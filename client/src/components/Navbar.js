@@ -15,7 +15,7 @@ const Navbar = ({loggedIn, setLoggedIn}) => {
             <h1>Handshake</h1>
             <div className="links">
                 <Link to="/">Home</Link>
-                {loggedIn && <Link to="/chatroom">Start Chatting</Link>} 
+                {loggedIn && <Link to="/rooms">Start Chatting</Link>} 
                 {loggedIn
                     ? <Link to="/" onClick={logOut}>Logout</Link>
                     : <Link to="/login">Login</Link>
