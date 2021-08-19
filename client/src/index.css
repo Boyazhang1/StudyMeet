@@ -51,33 +51,43 @@
   margin-bottom: 30px;
 }
 
-.chat-container {
-  max-width: 700px; 
-  height: 580px;
+.study-dashboard {
+  max-width: 90vw; 
+  min-height: 580px;
   background-color: #DEB887;
   border-radius: 10px; 
   display: grid;
-  grid-template-columns: 60px auto 60px; 
+  grid-template-columns: auto 15px 290px 15px;
+  grid-template-rows: 15px auto 15px; 
   place-items: center; 
   margin: 0 auto; 
+  justify-content: stretch;
+}
+.chat-container {
+  grid-column-start: 3; 
+  grid-column-end: 4; 
+  grid-row-start: 2; 
+  grid-row-end: 3; 
 }
 
+.whiteboard {
+  grid-column-start: 1; 
+  grid-column-end: 2; 
+  grid-row-start: 2;
+  grid-row-end: 3;
+}
 .chat-message-list {
+  align-self: start;
   background-color: white;
-  margin-top: 50px;
   padding-top: 20px;
-  grid-column-start: 2; 
-  grid-column-end: 3; 
   height: 430px;
-  width: 100%;
+  width: 250px;
   display: flex; 
   flex-direction: column-reverse;
   overflow-y: auto; 
 }
 
 .message-input {
-  grid-column-start: 2; 
-  grid-column-end: 3; 
   height: 100px;
   display: grid;
   max-width: 100%;
@@ -124,8 +134,6 @@
 }
 
 .message-input {
-  grid-column-start: 2;
-  grid-column-end: 3;
   height: 100px;
   display: grid;
   width: 100%;
@@ -141,7 +149,6 @@
 .message-input input {
   margin-top: 20px;
   height: 40px;
-  width: 300px;
   border-style: none;
   border-radius: 4px 0 0 4px;
   padding: 0 5px;
@@ -240,4 +247,8 @@ p.login {
 }
 .home-lobby-err-page h3 {
   margin: 50px auto 10px; 
+}
+
+.whiteboard canvas {
+  border: 2px solid black;
 }

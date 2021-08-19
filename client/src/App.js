@@ -50,7 +50,7 @@ function App() {
         </Route>
         {rooms && rooms.map(roomName => (
           <Route path={'/rooms/' + roomName}>
-            <Chatroom socket={socket} roomName={roomName}/>
+            {rooms && <Chatroom socket={socket} roomName={roomName}/>}
           </Route>
         ))}
       </Switch>

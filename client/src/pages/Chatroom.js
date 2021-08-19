@@ -1,6 +1,7 @@
 import {useState, useEffect} from 'react'
 import Cookies from 'js-cookie'
 import jwt_decode from "jwt-decode"
+import Whiteboard from '../components/Whiteboard'
 
 const Chatroom = ({socket, roomName}) => {
 
@@ -48,6 +49,7 @@ const Chatroom = ({socket, roomName}) => {
     return (
     <div className='chatroom'>
         <h1>Chatroom</h1>
+        <div className="study-dashboard">
         <div className='chat-container'>
             <div className="chat-message-list">
             {chat && chat.slice().reverse().map(({message, name}, index) => (
@@ -76,6 +78,8 @@ const Chatroom = ({socket, roomName}) => {
                     <button type='submit'>Submit</button>
                 </form>
         </div>
+        </div>
+        <Whiteboard/>
         </div>
     </div>
      );
