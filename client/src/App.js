@@ -9,7 +9,7 @@ import Cookies from "js-cookie"
 import Lobby from "./pages/Lobby";
 import io from 'socket.io-client'
 const socket = io('http://localhost:3020')
-
+console.log("rendered homepage")
 
 function App() {
   const [loggedIn, setLoggedIn] = useState(false)

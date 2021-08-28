@@ -2,9 +2,10 @@ import {useState, useEffect} from 'react'
 import Cookies from 'js-cookie'
 import jwt_decode from "jwt-decode"
 import Whiteboard from '../components/Whiteboard'
+import Board from '../components/whiteboardclass'
 
 const Chatroom = ({socket, roomName}) => {
-
+    
     const userName = jwt_decode(Cookies.get('jwt')).name
 
     const [chat, setChat] = useState([])
@@ -79,7 +80,7 @@ const Chatroom = ({socket, roomName}) => {
                 </form>
         </div>
         </div>
-        <Whiteboard/>
+        <Board socket={socket} roomName={roomName} />
         </div>
     </div>
      );

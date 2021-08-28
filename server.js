@@ -49,6 +49,9 @@ io.on('connection', socket => {
   socket.on('send-message', (messageObj, roomName) => {
     socket.to(roomName).emit('recieved-message', messageObj)
   })
+  socket.on('send-drawing', (drawingData, roomName) => {
+    socket.to(roomName).emit('received-drawing', drawingData)
+  })
 
   socket.on('disconnect', () => {
     getUserRooms(socket).forEach(roomName => {
