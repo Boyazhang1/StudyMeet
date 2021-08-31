@@ -7,12 +7,14 @@ import Board from '../components/whiteboardclass'
 const Chatroom = ({socket, roomName}) => {
     
     const userName = jwt_decode(Cookies.get('jwt')).name
+    const id = jwt_decode(Cookies.get('jwt')).id
 
     const [chat, setChat] = useState([])
     const [newMessage, setNewMessage] = useState({message: '', name: ''})
 
     useEffect(() => {
-        socket.emit('new-user', userName, roomName)
+
+        socket.emit('new-user', userName, roomName, id)
         console.log('new user emitted')
         setChat(chat.concat({...newMessage, message: "You joined the chat"}))
       }, [])
@@ -80,7 +82,7 @@ const Chatroom = ({socket, roomName}) => {
                 </form>
         </div>
         </div>
-        <Board socket={socket} roomName={roomName} />
+        <Whiteboard socket={socket} roomName={roomName} />
         </div>
     </div>
      );

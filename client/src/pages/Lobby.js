@@ -1,12 +1,10 @@
 import {useState} from 'react'
-import {Link, useHistory} from 'react-router-dom'
+import {Link} from 'react-router-dom'
 
 const Lobby = ({rooms}) => {
-    console.log(rooms)
-    const history = useHistory()
+
     const [roomName, setRoomName] = useState('')
     const [dupNameErr, setDupNameErr] = useState('')
-    const [selectedRoom, setSelectedRoom] = useState('')
 
     const newRoom = (e) => {
         e.preventDefault()
@@ -29,7 +27,7 @@ const Lobby = ({rooms}) => {
 
     return (
         <div className="home-lobby-err-page">
-            <h1>Join an existing room or create your own!</h1>
+            <h1>Join an existing study room or create your own!</h1>
             <form onSubmit={newRoom}>
                 <input type='text' list="rooms" value={roomName} onChange={({target}) => setRoomName(target.value)} required></input>
                 <button type='submit'>New Room </button>

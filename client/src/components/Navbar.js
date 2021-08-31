@@ -12,10 +12,10 @@ const Navbar = ({loggedIn, setLoggedIn}) => {
 
     return (
         <nav className="navbar">
-            <h1>Handshake</h1>
+            <h1>StudyMeet</h1>
             <div className="links">
                 <Link to="/">Home</Link>
-                {loggedIn && <Link to="/rooms">Start Chatting</Link>} 
+                {loggedIn && <Link to="/rooms">Start Studying</Link>} 
                 {loggedIn
                     ? <Link to="/" onClick={logOut}>Logout</Link>
                     : <Link to="/login">Login</Link>

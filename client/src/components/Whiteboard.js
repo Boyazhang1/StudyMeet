@@ -1,113 +1,95 @@
 import { useEffect, useRef, useState } from 'react';
-
+let ctx; 
+let canvasOffset; 
 
 const Whiteboard = ({socket, roomName}) => {
 
-
   const canvasRef = useRef()
   const divRef = useRef()
-  const [ctx, setCtx] = useState({});
-  const [canvasOffset, setCanvasOffset] = useState();
-  const [drawReceived, setDrawReceived] = useState(); 
+  const canvasLoaded = useRef(false)
 
   
   let timeout; 
   let drawing = false; 
   let current = {}
 
-
-  useEffect(() => {
+  const setUpCanvas = () => {
     const context = canvasRef.current.getContext('2d');
-    setCanvasOffset(canvasRef.current.getBoundingClientRect());
     canvasRef.current.width = divRef.current.clientWidth - 15; 
     canvasRef.current.height = divRef.current.clientHeight - 5;
-    console.log('rendered');
-    setCtx(context);
-  }, [ctx]);
+    ctx = context; 
+    canvasLoaded.current = true; 
+  }
+
+  useEffect(() => {
+    setUpCanvas(); 
+  }, []);
 
 
-  const drawLine = (x0, y0, x1, y1) => {
+  const drawLine = (x0, y0, x1, y1, emit) => {
+    canvasOffset = canvasRef.current.getBoundingClientRect();
     ctx.lineWidth = 3;
     ctx.lineCap = 'round';
     ctx.beginPath();
-    ctx.moveTo(x0 - parseInt(canvasOffset.x), y0 - (parseInt(canvasOffset.y) + window.scrollY)) ; 
-    ctx.lineTo(x1 - parseInt(canvasOffset.x), y1 - (parseInt(canvasOffset.y) + window.scrollY)); 
+    ctx.moveTo(x0 - parseInt(canvasOffset.x), y0 - (parseInt(canvasOffset.y)));
+    ctx.lineTo(x1 - parseInt(canvasOffset.x), y1 - (parseInt(canvasOffset.y))); 
     ctx.stroke();
     ctx.closePath();
-
-    // let w = canvasRef.current.width; 
-    // let h = canvasRef.current.height; 
-    socket.emit("send-drawing", {
-      // x0: x0 / w, 
-      // y0: y0 / h, 
-      // x1: x1 / w, 
-      // y1: y1 / h
-      x0, 
-      y0, 
-      x1, 
-      y1
-    }, roomName)
+    let w = canvasRef.current.width; 
+    let h = canvasRef.current.height; 
+    if (emit) {
+      socket.emit("send-drawing", {
+        x0: x0 / w, 
+        y0: y0 / h, 
+        x1: x1 / w, 
+        y1: y1 / h
+        // x0, 
+        // y0, 
+        // x1, 
+        // y1
+      }, roomName)
+    }
   }
 
 
   useEffect(() => {
-    canvasRef.current.addEventListener('mousemove', throttle(handleMouseMove, 20, false))
-    // drawLine(...Object.values(drawFrame))
+    console.log('used effect')
+    if (canvasLoaded) {
+      let w = canvasRef.current.width; 
+      let h = canvasRef.current.height; 
+      socket.on('received-drawing', drawingData => {
+        const {x0, y0, x1, y1} = drawingData; 
+        drawLine(x0 * w, y0 * h, x1 * w, y1 * h)
+      })
+    }
   })
-
-
-  socket.on('received-drawing', drawingData => {
-    console.log(ctx)
-    drawLine(drawingData)
-  })
- 
 
   const handleMouseDown = (e) => {
     drawing = true;
     current.x = e.clientX
     current.y = e.clientY
-    // handleMouseMove(e);
   };
   const handleMouseUp = (e) => {
     if (!drawing) return;
     drawing= false;
-    drawLine(current.x, current.y, e.clientX, e.pageY)
-    // ctx.beginPath();
+    drawLine(current.x, current.y, e.clientX, e.clientY, true)
   };
 
   const handleMouseMove = (e) => {
     if (!drawing) return;
-    drawLine(current.x, current.y, e.clientX, e.pageY)
+    drawLine(current.x, current.y, e.clientX, e.clientY, true)
     current.x = e.clientX
     current.y = e.clientY
-
-
-    // ctx.lineTo(
-    //   e.clientX - parseInt(canvasOffset.x),
-    //   e.pageY - (parseInt(canvasOffset.y) + window.scrollY)
-    // );
-    // ctx.stroke();
-    // ctx.beginPath();
-    // ctx.moveTo(
-    //   e.clientX - parseInt(canvasOffset.x),
-    //   e.pageY - (parseInt(canvasOffset.y) + window.scrollY)
-    // );
-
-    // if (timeout === undefined) clearTimeout(timeout)
-    // timeout = setTimeout(() => {
-    //   let imgData = canvasRef.current.toDataURL("image/png")
-    //   socket.emit("send-drawing", imgData, roomName)
-    // }, 1000)
   };
 
   const throttle = (callback, delay) => {
     let previousCall = new Date().getTime()
-    return function() {
+    return (e) => {
       const time = new Date().getTime(); 
 
       if ((time - previousCall) >= delay) {
         previousCall = time; 
-        callback.apply(null, arguments)
+        callback.apply(this, [e])
       }
     }
   }
@@ -117,7 +99,7 @@ const Whiteboard = ({socket, roomName}) => {
       <canvas
       ref={canvasRef}
         onMouseDown={handleMouseDown}
-        // onMouseMove={handleMouseMove}
+        onMouseMove={throttle(handleMouseMove, 20)}
         onMouseUp={handleMouseUp}
       ></canvas>
     </div>
