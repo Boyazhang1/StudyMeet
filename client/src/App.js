@@ -14,7 +14,7 @@ import Signup from "./pages/Signup";
 import Cookies from "js-cookie";
 import Lobby from "./pages/Lobby";
 import io from "socket.io-client";
-const socket = io("http://localhost:3020");
+const socket = io("http://localhost:3000" || "https://studymeet1.herokuapp.com");
 
 function App() {
   const [loggedIn, setLoggedIn] = useState(false);

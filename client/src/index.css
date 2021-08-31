@@ -15,7 +15,6 @@
   display: flex;
   align-items: center; 
   margin: 0 auto;
-  border-bottom: ３px solid black;
 }
 .navbar .links {
   margin-left: auto;
