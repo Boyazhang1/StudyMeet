@@ -8,7 +8,7 @@ const router = require("./routes/authenticationRoutes");
 const httpServer = require("http").createServer(app);
 const io = require("socket.io")(httpServer, {
   cors: {
-    origin: "http://localhost:3000",
+    origin: "http://localhost:3000" || "https://studymeet1.herokuapp.com/",
     method: ["GET", "POST"],
   },
 });
